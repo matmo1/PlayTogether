@@ -1,4 +1,3 @@
-.env
 __pycache__/
 *.pyc
 *.pyo
@@ -7,6 +6,5 @@ __pycache__/
 env/
 venv/
 *.sqlite3
-alembic.ini
 .qodo
 .vscode
