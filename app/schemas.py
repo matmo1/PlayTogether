@@ -4,9 +4,9 @@ from pydantic import BaseModel, EmailStr
 from enum import Enum
 
 class Gender(str, Enum):
-    male = "Male"
-    female = "Female"
-    other = "Other"
+    male = "male"
+    female = "female"
+    other = "other"
 
 class MatchStatus(str, Enum):
     pending = "Pending"

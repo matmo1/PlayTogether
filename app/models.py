@@ -4,9 +4,9 @@ from app.database import Base
 import enum
 
 class Gender(enum.Enum):
-    male = "Male"
-    female = "Female"
-    other = "Other"
+    male = "male"
+    female = "female"
+    other = "other"
 
 class MatchStatus(enum.Enum):
     pending = "Pending"
@@ -38,7 +38,7 @@ class Sport(Base):
     __tablename__ = 'sports'
     
     sport_id = Column(Integer, primary_key=True, index=True)
-    sport_name = Column(String(100), unique=True, nullable=False)
+    name = Column(String(100), unique=True, nullable=False)
     
     facilities = relationship("Facility", back_populates="sport")
     activities = relationship("Activity", back_populates="sport")
