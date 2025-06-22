@@ -37,8 +37,7 @@ class User(UserBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
-
+        from_attributes = True
 # Sport Schemas
 class SportBase(BaseModel):
     name: str
@@ -50,7 +49,7 @@ class Sport(SportBase):
     sport_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Facility Schemas
 class FacilityBase(BaseModel):
@@ -66,7 +65,7 @@ class Facility(FacilityBase):
     sport_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Activity Schemas
 class ActivityBase(BaseModel):
@@ -84,7 +83,7 @@ class Activity(ActivityBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Match Schemas
 class MatchBase(BaseModel):
@@ -99,7 +98,7 @@ class Match(MatchBase):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Booking Schemas
 class BookingBase(BaseModel):
@@ -117,4 +116,4 @@ class Booking(BookingBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

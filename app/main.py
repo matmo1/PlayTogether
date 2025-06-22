@@ -1,12 +1,53 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
-from . import models, schemas, crud
-from .database import engine, get_db
+from typing import Optional
+from datetime import timedelta, datetime
+from jose import jwt
+import os
+from passlib.context import CryptContext
+
+from app import models, schemas, crud
+from app.database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # или ["*"] докато разработваш
+    allow_credentials=True,
+    allow_methods=["*"],                      # GET, POST, PUT, DELETE, OPTIONS…
+    allow_headers=["*"],                      # Content-Type, Authorization…
+)
+
+# --- Security Config ---
+SECRET_KEY = os.getenv("JWT_SECRET", "CHANGE_THIS_SECRET")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def authenticate_user(db, email: str, password: str):
+    user = crud.get_user_by_email(db, email=email)
+    if not user or not verify_password(password, user.password_hash):
+        return None
+    return user
+
+from typing import Optional
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # --- User Endpoints ---
 @app.post("/users/", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
@@ -76,3 +117,18 @@ def create_booking_for_user(
 def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     bookings = crud.get_bookings(db, skip=skip, limit=limit)
     return bookings
+
+# --- Auth Token Endpoint ---
+@app.post("/token")
+def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": str(user.user_id)})
+    return {"access_token": access_token, "token_type": "bearer"}
