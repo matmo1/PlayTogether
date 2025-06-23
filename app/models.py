@@ -9,14 +9,14 @@ class Gender(enum.Enum):
     other = "other"
 
 class MatchStatus(enum.Enum):
-    pending = "Pending"
-    accepted = "Accepted"
-    rejected = "Rejected"
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
 
 class BookingStatus(enum.Enum):
-    pending = "Pending"
-    confirmed = "Confirmed"
-    cancelled = "Cancelled"
+    pending = "pending"
+    confirmed = "confirmed"
+    cancelled = "cancelled"
 
 class User(Base):
     __tablename__ = 'users'
@@ -77,6 +77,7 @@ class Match(Base):
     activity_id = Column(Integer, ForeignKey('activities.activity_id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     status = Column(Enum(MatchStatus), server_default='pending')
+    created_at = Column(DateTime, server_default='now()')
     
     activity = relationship("Activity", back_populates="matches")
     user = relationship("User", back_populates="matches")
@@ -88,7 +89,7 @@ class Booking(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     facility_id = Column(Integer, ForeignKey('facilities.facility_id'), nullable=False)
     booking_date = Column(DateTime)
-    duration = Column(Integer)  # Duration in hours
+    duration = Column(Integer)
     status = Column(Enum(BookingStatus), server_default='pending')
     created_at = Column(DateTime, server_default='now()')
     

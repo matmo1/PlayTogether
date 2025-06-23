@@ -9,22 +9,22 @@ class Gender(str, Enum):
     other = "other"
 
 class MatchStatus(str, Enum):
-    pending = "Pending"
-    accepted = "Accepted"
-    rejected = "Rejected"
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
 
 class BookingStatus(str, Enum):
-    pending = "Pending"
-    confirmed = "Confirmed"
-    cancelled = "Cancelled"
+    pending = "pending"
+    confirmed = "confirmed"
+    cancelled = "cancelled"
 
-# User Schemas
 class UserBase(BaseModel):
     username: str
     email: EmailStr
 
 class UserCreate(UserBase):
     password: str
+    email: EmailStr
     full_name: Optional[str] = None
     gender: Optional[Gender] = None
     birth_date: Optional[date] = None
@@ -38,20 +38,19 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
-# Sport Schemas
+
 class SportBase(BaseModel):
     name: str
-
-class SportCreate(SportBase):
-    pass
 
 class Sport(SportBase):
     sport_id: int
 
     class Config:
         from_attributes = True
+        
+class SportCreate(SportBase):
+    pass
 
-# Facility Schemas
 class FacilityBase(BaseModel):
     name: str
     address: Optional[str] = None
@@ -67,7 +66,6 @@ class Facility(FacilityBase):
     class Config:
         from_attributes = True
 
-# Activity Schemas
 class ActivityBase(BaseModel):
     description: str
     activity_date: datetime
@@ -85,7 +83,6 @@ class Activity(ActivityBase):
     class Config:
         from_attributes = True
 
-# Match Schemas
 class MatchBase(BaseModel):
     status: MatchStatus = MatchStatus.pending
 
@@ -96,11 +93,11 @@ class Match(MatchBase):
     match_id: int
     activity_id: int
     user_id: int
+    created_at: datetime
 
     class Config:
         from_attributes = True
 
-# Booking Schemas
 class BookingBase(BaseModel):
     booking_date: datetime
     duration: int
@@ -117,3 +114,10 @@ class Booking(BookingBase):
 
     class Config:
         from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    user_id: Optional[int] = None

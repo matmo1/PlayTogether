@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# --- User Operations ---
+# User operations
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.user_id == user_id).first()
 
@@ -29,7 +29,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-# --- Sport Operations ---
+# Sport operations
 def get_sport(db: Session, sport_id: int):
     return db.query(models.Sport).filter(models.Sport.sport_id == sport_id).first()
 
@@ -43,7 +43,7 @@ def create_sport(db: Session, sport: schemas.SportCreate):
     db.refresh(db_sport)
     return db_sport
 
-# --- Facility Operations ---
+# Facility operations
 def get_facility(db: Session, facility_id: int):
     return db.query(models.Facility).filter(models.Facility.facility_id == facility_id).first()
 
@@ -62,7 +62,7 @@ def create_facility(db: Session, facility: schemas.FacilityCreate):
     db.refresh(db_facility)
     return db_facility
 
-# --- Activity Operations ---
+# Activity operations
 def get_activity(db: Session, activity_id: int):
     return db.query(models.Activity).filter(models.Activity.activity_id == activity_id).first()
 
@@ -82,26 +82,38 @@ def create_activity(db: Session, activity: schemas.ActivityCreate, user_id: int)
     db.refresh(db_activity)
     return db_activity
 
-# --- Match Operations ---
+# Match operations
+def get_match(db: Session, match_id: int):
+    return db.query(models.Match).filter(models.Match.match_id == match_id).first()
+
+def get_matches(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Match).offset(skip).limit(limit).all()
+
 def create_match(db: Session, match: schemas.MatchCreate, user_id: int):
     db_match = models.Match(
         activity_id=match.activity_id,
         user_id=user_id,
-        status=match.status
+        status=match.status.value
     )
     db.add(db_match)
     db.commit()
     db.refresh(db_match)
     return db_match
 
-# --- Booking Operations ---
+# Booking operations
+def get_booking(db: Session, booking_id: int):
+    return db.query(models.Booking).filter(models.Booking.booking_id == booking_id).first()
+
+def get_bookings(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Booking).offset(skip).limit(limit).all()
+
 def create_booking(db: Session, booking: schemas.BookingCreate, user_id: int):
     db_booking = models.Booking(
         user_id=user_id,
         facility_id=booking.facility_id,
         booking_date=booking.booking_date,
         duration=booking.duration,
-        status=booking.status
+        status=booking.status.value
     )
     db.add(db_booking)
     db.commit()
