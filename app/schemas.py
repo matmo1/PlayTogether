@@ -1,5 +1,6 @@
+import enum
 from datetime import datetime, date
-from typing import Optional, List
+from typing import Optional, List, Literal
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 
@@ -13,15 +14,18 @@ class MatchStatus(str, Enum):
     accepted = "Accepted"
     rejected = "Rejected"
 
-class BookingStatus(str, Enum):
-    pending = "Pending"
-    confirmed = "Confirmed"
-    cancelled = "Cancelled"
-
+class BookingStatus(str, enum.Enum):
+    pending = "pending"
+    confirmed = "confirmed"
+    cancelled = "cancelled"
 # User Schemas
 class UserBase(BaseModel):
     username: str
     email: EmailStr
+
+class UserRole(str, Enum):
+    user = "user"
+    admin = "admin"
 
 class UserCreate(UserBase):
     password: str
@@ -35,6 +39,7 @@ class User(UserBase):
     gender: Optional[Gender]
     birth_date: Optional[date]
     created_at: datetime
+    role: UserRole
 
     class Config:
         from_attributes = True
@@ -67,14 +72,23 @@ class Facility(FacilityBase):
     class Config:
         from_attributes = True
 
+class FacilityUpdate(BaseModel):
+    name: Optional[str]
+    address: Optional[str]
+    contact_info: Optional[str]
+    sport_id: Optional[int]
+
 # Activity Schemas
 class ActivityBase(BaseModel):
     description: str
     activity_date: datetime
     location: str
 
+# --- Activity Schemas ---
 class ActivityCreate(ActivityBase):
     sport_id: int
+    participant_usernames: Optional[List[str]] = None   # <-- НОВО
+
 
 class Activity(ActivityBase):
     activity_id: int
@@ -114,6 +128,7 @@ class Booking(BookingBase):
     user_id: int
     facility_id: int
     created_at: datetime
+    status: BookingStatus
 
     class Config:
         from_attributes = True

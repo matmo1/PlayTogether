@@ -14,9 +14,13 @@ class MatchStatus(enum.Enum):
     rejected = "Rejected"
 
 class BookingStatus(enum.Enum):
-    pending = "Pending"
-    confirmed = "Confirmed"
-    cancelled = "Cancelled"
+    pending = "pending"
+    confirmed = "confirmed"
+    cancelled = "cancelled"
+
+class UserRole(str, enum.Enum):
+    user = "user"
+    admin = "admin"
 
 class User(Base):
     __tablename__ = 'users'
@@ -26,6 +30,8 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(100))
+    role = Column(Enum(UserRole), nullable=False, server_default="user")
+
     gender = Column(Enum(Gender))
     birth_date = Column(Date)
     created_at = Column(DateTime, server_default='now()')
@@ -89,7 +95,9 @@ class Booking(Base):
     facility_id = Column(Integer, ForeignKey('facilities.facility_id'), nullable=False)
     booking_date = Column(DateTime)
     duration = Column(Integer)  # Duration in hours
-    status = Column(Enum(BookingStatus), server_default='pending')
+    status = Column(
+        Enum(BookingStatus, name="bookingstatus"), server_default="pending",
+    )
     created_at = Column(DateTime, server_default='now()')
     
     user = relationship("User", back_populates="bookings")
